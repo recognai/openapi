@@ -269,8 +269,14 @@ def _httpresource(endpoint, method, properties, convert, render_examples,
 
     # print request's path params
     for param in filter(lambda p: p['in'] == 'path', parameters):
+        schema = param['schema']
+        if 'allOf' in schema:
+            schema = copy.deepcopy(schema['allOf'][0])
+        if 'anyOf' in schema:
+            schema = copy.deepcopy(schema['anyOf'][0])
+
         yield indent + ':param {type} {name}:'.format(
-            type=param['schema']['type'],
+            type=schema['type'],
             name=param['name'])
 
         for line in convert(param.get('description', '')).splitlines():
