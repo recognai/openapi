@@ -396,6 +396,11 @@ def openapihttpdomain(spec, **options):
 
     # Paths list to be processed
     paths = []
+    # Sometimes servers set the base api url path
+    server = spec.get("servers", [])
+    server_url = None
+    if server and len(server) > 0:
+        server_url = server[0]["url"]
 
     # If 'paths' are passed we've got to ensure they exist within an OpenAPI
     # spec; otherwise raise error and ask user to fix that.
@@ -446,7 +451,7 @@ def openapihttpdomain(spec, **options):
             for method, properties in spec['paths'][endpoint].items():
                 key = properties.get('tags', [''])[0]
                 groups.setdefault(key, []).append(_httpresource(
-                    endpoint,
+                    server_url + endpoint if server_url else endpoint,
                     method,
                     properties,
                     convert,
@@ -464,7 +469,7 @@ def openapihttpdomain(spec, **options):
         for endpoint in paths:
             for method, properties in spec['paths'][endpoint].items():
                 generators.append(_httpresource(
-                    endpoint,
+                    server_url + endpoint if server_url else endpoint,
                     method,
                     properties,
                     convert,
