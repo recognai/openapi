@@ -307,6 +307,8 @@ def _httpresource(endpoint, method, properties, convert, render_examples,
         request_content = properties.get('requestBody', {}).get('content', {})
         if request_content and 'application/json' in request_content:
             schema = request_content['application/json']['schema']
+            if "allOf" in schema:
+                schema = schema["allOf"][0]
 
             yield ''
             for line in convert_json_schema(schema):
